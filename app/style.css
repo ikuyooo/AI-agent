@@ -1,0 +1,173 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap');
+
+/* Global Font & Theme */
+html, body, [class*="css"], [class*="st-"] {
+    font-family: 'Outfit', sans-serif !important;
+}
+
+/* Background gradient for the whole app */
+.stApp {
+    background: radial-gradient(circle at 50% 50%, #111827 0%, #030712 100%) !important;
+    color: #F3F4F6 !important;
+}
+
+/* Glassmorphism Sidebar */
+[data-testid="stSidebar"] {
+    background-color: rgba(17, 24, 39, 0.7) !important;
+    backdrop-filter: blur(16px) !important;
+    -webkit-backdrop-filter: blur(16px) !important;
+    border-right: 1px solid rgba(255, 255, 255, 0.05) !important;
+}
+
+[data-testid="stSidebar"] [data-testid="stMarkdownContainer"] h1 {
+    color: #8B5CF6 !important;
+    text-shadow: 0 0 10px rgba(139, 92, 246, 0.3);
+}
+
+/* Premium Headers */
+h1, h2, h3 {
+    font-weight: 700 !important;
+    letter-spacing: -0.02em !important;
+}
+
+h1 {
+    background: linear-gradient(135deg, #A78BFA 0%, #EC4899 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 20px !important;
+}
+
+h2 {
+    color: #F3F4F6 !important;
+    border-bottom: 2px solid rgba(139, 92, 246, 0.2);
+    padding-bottom: 10px;
+    margin-bottom: 20px !important;
+}
+
+/* Glassmorphic Cards & Expanders */
+div[data-testid="stExpander"] {
+    background: rgba(255, 255, 255, 0.03) !important;
+    border: 1px solid rgba(255, 255, 255, 0.05) !important;
+    border-radius: 12px !important;
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3) !important;
+    backdrop-filter: blur(8px) !important;
+    -webkit-backdrop-filter: blur(8px) !important;
+    margin-bottom: 12px !important;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+div[data-testid="stExpander"]:hover {
+    border-color: rgba(139, 92, 246, 0.4) !important;
+    box-shadow: 0 8px 32px 0 rgba(139, 92, 246, 0.15) !important;
+    transform: translateY(-2px);
+}
+
+/* Custom Styled Tabs */
+button[data-baseweb="tab"] {
+    font-weight: 600 !important;
+    color: #9CA3AF !important;
+    border-bottom: 2px solid transparent !important;
+    transition: all 0.3s ease !important;
+    background: transparent !important;
+}
+
+button[data-baseweb="tab"]:hover {
+    color: #A78BFA !important;
+}
+
+button[aria-selected="true"] {
+    color: #8B5CF6 !important;
+    border-bottom-color: #8B5CF6 !important;
+    text-shadow: 0 0 8px rgba(139, 92, 246, 0.4);
+}
+
+/* Custom Styled Buttons */
+div.stButton > button {
+    background: linear-gradient(135deg, #6366F1 0%, #8B5CF6 100%) !important;
+    color: #FFFFFF !important;
+    border: none !important;
+    border-radius: 8px !important;
+    padding: 8px 20px !important;
+    font-weight: 600 !important;
+    letter-spacing: 0.02em !important;
+    box-shadow: 0 4px 14px rgba(99, 102, 241, 0.3) !important;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+div.stButton > button:hover {
+    transform: scale(1.03) !important;
+    box-shadow: 0 6px 20px rgba(139, 92, 246, 0.5) !important;
+    background: linear-gradient(135deg, #8B5CF6 0%, #D946EF 100%) !important;
+}
+
+div.stButton > button:active {
+    transform: scale(0.98) !important;
+}
+
+/* Secondary/Alternative button style mapping */
+div.stButton > button[kind="primary"] {
+    background: linear-gradient(135deg, #10B981 0%, #059669 100%) !important;
+    box-shadow: 0 4px 14px rgba(16, 185, 129, 0.3) !important;
+}
+
+div.stButton > button[kind="primary"]:hover {
+    background: linear-gradient(135deg, #34D399 0%, #10B981 100%) !important;
+    box-shadow: 0 6px 20px rgba(16, 185, 129, 0.5) !important;
+}
+
+/* Chat Input Bar customization */
+[data-testid="stChatInput"] {
+    background-color: rgba(31, 41, 55, 0.8) !important;
+    border: 1px solid rgba(255, 255, 255, 0.08) !important;
+    border-radius: 12px !important;
+    backdrop-filter: blur(8px) !important;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2) !important;
+}
+
+/* Chat Messages */
+[data-testid="stChatMessage"] {
+    background-color: rgba(255, 255, 255, 0.02) !important;
+    border: 1px solid rgba(255, 255, 255, 0.03) !important;
+    border-radius: 12px !important;
+    padding: 15px !important;
+    margin-bottom: 12px !important;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1) !important;
+}
+
+[data-testid="stChatMessage"][data-user="true"] {
+    background-color: rgba(99, 102, 241, 0.08) !important;
+    border-color: rgba(99, 102, 241, 0.2) !important;
+}
+
+/* File Uploader area */
+[data-testid="stFileUploader"] {
+    background: rgba(255, 255, 255, 0.02) !important;
+    border: 2px dashed rgba(139, 92, 246, 0.3) !important;
+    border-radius: 12px !important;
+    padding: 20px !important;
+    transition: all 0.3s ease !important;
+}
+
+[data-testid="stFileUploader"]:hover {
+    border-color: #8B5CF6 !important;
+    background: rgba(139, 92, 246, 0.03) !important;
+}
+
+/* Custom scrollbars */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.02);
+}
+
+::-webkit-scrollbar-thumb {
+    background: rgba(139, 92, 246, 0.3);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: rgba(139, 92, 246, 0.5);
+}

@@ -1,0 +1,1877 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ResearchAI — Intelligent Academic Assistant</title>
+  <meta name="description" content="AI-powered research assistant for academics, PhD students, and researchers." />
+
+  <!-- Google Fonts: Syne + DM Sans + JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+
+  <style>
+    /* ============================================================
+       SECTION 1: CSS CUSTOM PROPERTIES (DESIGN TOKENS)
+    ============================================================ */
+    :root {
+      /* Colors */
+      --bg-app: #FAFAF8;
+      --bg-surface: #FFFFFF;
+      --bg-sidebar: rgba(255, 255, 255, 0.72);
+      --bg-hover: #F4F4FF;
+
+      --accent-primary-start: #5B5FEE;
+      --accent-primary-end: #8B5CF6;
+      --accent-primary: #5B5FEE;
+      --accent-teal: #0EA5A0;
+      --accent-amber: #F59E0B;
+      --accent-coral: #F43F5E;
+      --accent-green: #10B981;
+
+      --text-primary: #1A1A2E;
+      --text-secondary: #64748B;
+      --text-muted: #94A3B8;
+      --text-on-accent: #FFFFFF;
+
+      --border-default: #E8E8F0;
+      --border-focus: #5B5FEE;
+
+      --shadow-card: 0 2px 12px rgba(91, 95, 238, 0.08);
+      --shadow-hover: 0 8px 24px rgba(91, 95, 238, 0.14);
+      --shadow-tab-active: 0 4px 14px rgba(91, 95, 238, 0.28);
+
+      /* Gradient */
+      --gradient-primary: linear-gradient(135deg, var(--accent-primary-start) 0%, var(--accent-primary-end) 100%);
+
+      /* Spacing */
+      --sidebar-w: 280px;
+      --radius-sm: 8px;
+      --radius-md: 12px;
+      --radius-lg: 18px;
+      --radius-xl: 24px;
+      --radius-pill: 999px;
+
+      /* Typography */
+      --font-display: 'Syne', sans-serif;
+      --font-body: 'DM Sans', sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+
+      /* Transitions */
+      --t-fast: 150ms ease;
+      --t-normal: 220ms ease;
+      --t-slow: 350ms ease;
+    }
+
+    /* ============================================================
+       SECTION 2: GLOBAL RESET & BASE
+    ============================================================ */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body {
+      height: 100%;
+      font-family: var(--font-body);
+      background: var(--bg-app);
+      color: var(--text-primary);
+      font-size: 15px;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar { width: 4px; height: 4px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: rgba(91,95,238,0.25); border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: rgba(91,95,238,0.5); }
+
+    /* ============================================================
+       SECTION 3: APP SHELL LAYOUT
+    ============================================================ */
+    .app-shell {
+      display: flex;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    /* ============================================================
+       SECTION 4: SIDEBAR
+    ============================================================ */
+    .sidebar {
+      width: var(--sidebar-w);
+      flex-shrink: 0;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      background: var(--bg-sidebar);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-right: 1px solid var(--border-default);
+      overflow-y: auto;
+      overflow-x: hidden;
+      position: relative;
+      z-index: 10;
+    }
+
+    /* Logo Area */
+    .sidebar-logo {
+      padding: 24px 20px 20px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      border-bottom: 1px solid var(--border-default);
+    }
+
+    .logo-icon {
+      width: 36px;
+      height: 36px;
+      background: var(--gradient-primary);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      font-size: 17px;
+    }
+
+    .logo-text {
+      font-family: var(--font-display);
+      font-weight: 800;
+      font-size: 17px;
+      background: var(--gradient-primary);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      letter-spacing: -0.02em;
+    }
+
+    .logo-badge {
+      margin-left: auto;
+      font-size: 10px;
+      font-weight: 600;
+      background: var(--bg-hover);
+      color: var(--accent-primary);
+      padding: 2px 8px;
+      border-radius: var(--radius-pill);
+      border: 1px solid rgba(91,95,238,0.2);
+      letter-spacing: 0.04em;
+    }
+
+    /* Upload Zone */
+    .sidebar-section {
+      padding: 18px 16px 12px;
+    }
+
+    .sidebar-label {
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--text-muted);
+      margin-bottom: 10px;
+    }
+
+    .upload-zone {
+      border: 2px dashed var(--border-default);
+      border-radius: var(--radius-md);
+      padding: 20px 12px;
+      text-align: center;
+      cursor: pointer;
+      transition: all var(--t-normal);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .upload-zone:hover, .upload-zone.drag-over {
+      border-color: var(--accent-primary);
+      background: rgba(91,95,238,0.04);
+    }
+
+    .upload-zone.drag-over {
+      animation: pulse-border 1s ease infinite;
+    }
+
+    @keyframes pulse-border {
+      0%, 100% { border-color: var(--accent-primary); box-shadow: 0 0 0 0 rgba(91,95,238,0.2); }
+      50% { border-color: var(--accent-primary-end); box-shadow: 0 0 0 5px rgba(91,95,238,0); }
+    }
+
+    .upload-icon { font-size: 24px; margin-bottom: 6px; display: block; }
+
+    .upload-text {
+      font-size: 12px;
+      color: var(--text-secondary);
+      line-height: 1.5;
+    }
+
+    .upload-text strong { color: var(--accent-primary); font-weight: 600; }
+
+    .upload-filetypes {
+      margin-top: 6px;
+      font-size: 10px;
+      color: var(--text-muted);
+      font-family: var(--font-mono);
+    }
+
+    /* File chips in sidebar */
+    .doc-list { display: flex; flex-direction: column; gap: 6px; padding: 0 16px 12px; }
+
+    .doc-chip {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      padding: 9px 11px;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border-default);
+      background: var(--bg-surface);
+      cursor: pointer;
+      transition: all var(--t-normal);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .doc-chip::before {
+      content: '';
+      position: absolute;
+      left: 0; top: 0; bottom: 0;
+      width: 3px;
+      background: var(--gradient-primary);
+      opacity: 0;
+      transition: opacity var(--t-normal);
+    }
+
+    .doc-chip.selected { border-color: rgba(91,95,238,0.3); background: rgba(91,95,238,0.04); }
+    .doc-chip.selected::before { opacity: 1; }
+
+    .doc-chip:hover { box-shadow: var(--shadow-card); transform: translateY(-1px); }
+
+    .doc-chip-checkbox {
+      width: 16px; height: 16px;
+      border-radius: 4px;
+      border: 1.5px solid var(--border-default);
+      background: white;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+      transition: all var(--t-fast);
+    }
+
+    .doc-chip.selected .doc-chip-checkbox {
+      background: var(--gradient-primary);
+      border-color: transparent;
+    }
+
+    .doc-chip.selected .doc-chip-checkbox::after {
+      content: '✓';
+      color: white;
+      font-size: 10px;
+      font-weight: 700;
+    }
+
+    .doc-chip-icon { font-size: 16px; flex-shrink: 0; }
+
+    .doc-chip-info { flex: 1; min-width: 0; }
+
+    .doc-chip-name {
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--text-primary);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .doc-chip-meta {
+      font-size: 10px;
+      color: var(--text-muted);
+      font-family: var(--font-mono);
+    }
+
+    .doc-chip-status { flex-shrink: 0; }
+
+    .status-dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      display: inline-block;
+    }
+    .status-dot.ready { background: var(--accent-green); box-shadow: 0 0 0 2px rgba(16,185,129,0.15); }
+    .status-dot.processing { background: var(--accent-amber); animation: pulse-dot 1s ease infinite; }
+
+    @keyframes pulse-dot {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.5; transform: scale(0.8); }
+    }
+
+    /* Sidebar Footer */
+    .sidebar-footer {
+      margin-top: auto;
+      padding: 14px 16px;
+      border-top: 1px solid var(--border-default);
+    }
+
+    .model-badge {
+      font-size: 11px;
+      color: var(--text-secondary);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 8px;
+    }
+
+    .model-badge span {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      background: rgba(91,95,238,0.08);
+      color: var(--accent-primary);
+      padding: 2px 7px;
+      border-radius: var(--radius-pill);
+    }
+
+    .token-bar-label {
+      font-size: 10px;
+      color: var(--text-muted);
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 4px;
+    }
+
+    .token-bar-track {
+      height: 4px;
+      border-radius: var(--radius-pill);
+      background: var(--border-default);
+      overflow: hidden;
+    }
+
+    .token-bar-fill {
+      height: 100%;
+      border-radius: var(--radius-pill);
+      background: var(--gradient-primary);
+      width: 42%;
+      transition: width var(--t-slow);
+    }
+
+    /* ============================================================
+       SECTION 5: MAIN CONTENT AREA
+    ============================================================ */
+    .main-content {
+      flex: 1;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    /* Top Bar */
+    .top-bar {
+      padding: 16px 28px 0;
+      flex-shrink: 0;
+      background: var(--bg-app);
+    }
+
+    /* Tabs */
+    .tab-nav {
+      display: flex;
+      gap: 6px;
+      background: rgba(91,95,238,0.06);
+      padding: 5px;
+      border-radius: var(--radius-xl);
+      width: fit-content;
+    }
+
+    .tab-btn {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 18px;
+      border: none;
+      background: transparent;
+      cursor: pointer;
+      font-family: var(--font-body);
+      font-size: 13.5px;
+      font-weight: 500;
+      color: var(--text-secondary);
+      border-radius: var(--radius-lg);
+      transition: all var(--t-normal);
+      white-space: nowrap;
+      user-select: none;
+    }
+
+    .tab-btn:hover { color: var(--accent-primary); background: rgba(91,95,238,0.07); }
+
+    .tab-btn.active {
+      background: var(--gradient-primary);
+      color: white;
+      font-weight: 600;
+      box-shadow: var(--shadow-tab-active);
+    }
+
+    /* Tab content area */
+    .tab-content-area {
+      flex: 1;
+      overflow: hidden;
+      padding: 20px 28px 24px;
+      position: relative;
+    }
+
+    .tab-panel {
+      display: none;
+      height: 100%;
+      animation: fadeIn var(--t-normal) ease;
+    }
+
+    .tab-panel.active { display: flex; flex-direction: column; }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ============================================================
+       SECTION 6: REUSABLE COMPONENTS
+    ============================================================ */
+
+    /* Card */
+    .card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-default);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-card);
+      transition: all var(--t-normal);
+    }
+
+    .card:hover { box-shadow: var(--shadow-hover); transform: translateY(-2px); }
+
+    /* Buttons */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 9px 20px;
+      border-radius: var(--radius-pill);
+      border: none;
+      font-family: var(--font-body);
+      font-size: 13.5px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all var(--t-fast);
+      user-select: none;
+    }
+
+    .btn:active { transform: scale(0.97); }
+
+    .btn-primary {
+      background: var(--gradient-primary);
+      color: white;
+      box-shadow: 0 4px 14px rgba(91,95,238,0.3);
+    }
+    .btn-primary:hover { box-shadow: 0 6px 20px rgba(91,95,238,0.45); filter: brightness(1.05); }
+
+    .btn-outline {
+      background: transparent;
+      color: var(--accent-primary);
+      border: 1.5px solid rgba(91,95,238,0.35);
+    }
+    .btn-outline:hover { background: rgba(91,95,238,0.06); border-color: var(--accent-primary); }
+
+    .btn-ghost {
+      background: transparent;
+      color: var(--text-secondary);
+    }
+    .btn-ghost:hover { background: var(--bg-hover); color: var(--text-primary); }
+
+    /* Confidence Badge */
+    .confidence-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 10.5px;
+      font-weight: 600;
+      padding: 3px 9px;
+      border-radius: var(--radius-pill);
+      animation: badge-pulse 0.6s ease forwards;
+    }
+
+    @keyframes badge-pulse {
+      0% { transform: scale(0.8); opacity: 0; }
+      60% { transform: scale(1.05); }
+      100% { transform: scale(1); opacity: 1; }
+    }
+
+    .badge-high { background: rgba(16,185,129,0.1); color: #059669; }
+    .badge-medium { background: rgba(245,158,11,0.1); color: #D97706; }
+    .badge-low { background: rgba(244,63,94,0.1); color: #E11D48; }
+
+    /* Section heading */
+    .section-title {
+      font-family: var(--font-display);
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 4px;
+      letter-spacing: -0.02em;
+    }
+
+    .section-subtitle {
+      font-size: 13px;
+      color: var(--text-secondary);
+      margin-bottom: 18px;
+    }
+
+    /* ============================================================
+       SECTION 7: TAB 1 — CHAT
+    ============================================================ */
+    .chat-layout {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      gap: 0;
+    }
+
+    .chat-context-bar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 9px 14px;
+      background: rgba(91,95,238,0.05);
+      border: 1px solid rgba(91,95,238,0.12);
+      border-radius: var(--radius-md);
+      margin-bottom: 14px;
+      font-size: 12.5px;
+      color: var(--text-secondary);
+      flex-shrink: 0;
+    }
+
+    .context-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 11.5px;
+      font-weight: 500;
+      color: var(--accent-primary);
+      background: rgba(91,95,238,0.1);
+      padding: 3px 10px;
+      border-radius: var(--radius-pill);
+    }
+
+    .chat-messages {
+      flex: 1;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      padding-right: 4px;
+    }
+
+    /* Message Bubbles */
+    .message { display: flex; align-items: flex-start; gap: 10px; }
+    .message.user { flex-direction: row-reverse; }
+
+    .avatar {
+      width: 32px; height: 32px;
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 14px;
+      flex-shrink: 0;
+    }
+
+    .avatar.user { background: var(--gradient-primary); }
+    .avatar.ai { background: rgba(14,165,160,0.12); border: 1px solid rgba(14,165,160,0.2); }
+
+    .bubble {
+      max-width: 72%;
+      padding: 12px 16px;
+      border-radius: var(--radius-lg);
+      font-size: 14px;
+      line-height: 1.65;
+    }
+
+    .bubble.user {
+      background: var(--gradient-primary);
+      color: white;
+      border-bottom-right-radius: 4px;
+    }
+
+    .bubble.ai {
+      background: var(--bg-surface);
+      color: var(--text-primary);
+      border: 1px solid var(--border-default);
+      box-shadow: var(--shadow-card);
+      border-bottom-left-radius: 4px;
+    }
+
+    /* Citation chips below AI bubble */
+    .citations {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 10px;
+    }
+
+    .citation-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--accent-teal);
+      background: rgba(14,165,160,0.08);
+      border: 1px solid rgba(14,165,160,0.2);
+      padding: 4px 10px;
+      border-radius: var(--radius-pill);
+      cursor: pointer;
+      font-family: var(--font-mono);
+      transition: all var(--t-fast);
+    }
+
+    .citation-chip:hover {
+      background: rgba(14,165,160,0.15);
+      border-color: var(--accent-teal);
+      transform: translateY(-1px);
+    }
+
+    /* Citation Drawer */
+    .citation-drawer {
+      margin-top: 10px;
+      padding: 12px 14px;
+      background: rgba(14,165,160,0.05);
+      border: 1px solid rgba(14,165,160,0.15);
+      border-radius: var(--radius-md);
+      display: none;
+    }
+    .citation-drawer.open { display: block; animation: fadeIn 0.2s ease; }
+
+    .citation-excerpt {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: var(--text-secondary);
+      line-height: 1.6;
+    }
+
+    .citation-highlight { background: rgba(245,158,11,0.2); border-radius: 3px; padding: 0 2px; }
+
+    /* Typing indicator */
+    .typing-indicator {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .typing-dots { display: flex; gap: 4px; align-items: center; padding: 12px 16px; }
+
+    .typing-dot {
+      width: 7px; height: 7px;
+      border-radius: 50%;
+      background: var(--accent-primary);
+      opacity: 0.4;
+      animation: typing-bounce 1.2s ease infinite;
+    }
+
+    .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+    .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+
+    @keyframes typing-bounce {
+      0%, 100% { opacity: 0.4; transform: translateY(0); }
+      50% { opacity: 1; transform: translateY(-5px); }
+    }
+
+    /* Chat Input */
+    .chat-input-area {
+      flex-shrink: 0;
+      padding-top: 14px;
+      border-top: 1px solid var(--border-default);
+      margin-top: 14px;
+    }
+
+    .chat-input-wrapper {
+      display: flex;
+      align-items: flex-end;
+      gap: 10px;
+      background: var(--bg-surface);
+      border: 1.5px solid var(--border-default);
+      border-radius: var(--radius-xl);
+      padding: 10px 12px 10px 18px;
+      box-shadow: var(--shadow-card);
+      transition: border-color var(--t-fast);
+    }
+
+    .chat-input-wrapper:focus-within {
+      border-color: var(--accent-primary);
+      box-shadow: 0 0 0 4px rgba(91,95,238,0.08);
+    }
+
+    .chat-textarea {
+      flex: 1;
+      border: none;
+      outline: none;
+      resize: none;
+      font-family: var(--font-body);
+      font-size: 14px;
+      color: var(--text-primary);
+      background: transparent;
+      max-height: 120px;
+      line-height: 1.5;
+    }
+
+    .chat-textarea::placeholder { color: var(--text-muted); }
+
+    .send-btn {
+      width: 38px; height: 38px;
+      border-radius: 12px;
+      background: var(--gradient-primary);
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      color: white;
+      font-size: 16px;
+      box-shadow: 0 4px 12px rgba(91,95,238,0.3);
+      transition: all var(--t-fast);
+    }
+
+    .send-btn:hover { transform: scale(1.05); box-shadow: 0 6px 16px rgba(91,95,238,0.45); }
+    .send-btn:active { transform: scale(0.95); }
+
+    /* ============================================================
+       SECTION 8: TAB 2 — SUMMARY
+    ============================================================ */
+    .summary-layout { display: flex; flex-direction: column; height: 100%; }
+
+    .summary-controls {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 16px;
+      flex-shrink: 0;
+    }
+
+    .select-styled {
+      padding: 9px 14px;
+      border: 1.5px solid var(--border-default);
+      border-radius: var(--radius-md);
+      background: var(--bg-surface);
+      font-family: var(--font-body);
+      font-size: 13.5px;
+      color: var(--text-primary);
+      outline: none;
+      cursor: pointer;
+      transition: border-color var(--t-fast);
+      min-width: 200px;
+    }
+    .select-styled:focus { border-color: var(--accent-primary); }
+
+    .summary-type-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-bottom: 18px;
+      flex-shrink: 0;
+    }
+
+    .summary-type-card {
+      padding: 14px;
+      border: 1.5px solid var(--border-default);
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      background: var(--bg-surface);
+      transition: all var(--t-normal);
+      text-align: center;
+    }
+
+    .summary-type-card:hover {
+      border-color: rgba(91,95,238,0.3);
+      background: rgba(91,95,238,0.03);
+      box-shadow: var(--shadow-card);
+      transform: translateY(-2px);
+    }
+
+    .summary-type-card.selected {
+      border-color: var(--accent-primary);
+      background: rgba(91,95,238,0.06);
+    }
+
+    .summary-type-card .card-icon { font-size: 22px; margin-bottom: 5px; display: block; }
+    .summary-type-card .card-label { font-size: 12.5px; font-weight: 600; color: var(--text-primary); }
+
+    .summary-output {
+      flex: 1;
+      overflow-y: auto;
+      position: relative;
+    }
+
+    .summary-output-inner {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-default);
+      border-radius: var(--radius-lg);
+      padding: 22px 24px;
+      box-shadow: inset 0 2px 6px rgba(91,95,238,0.04);
+      position: relative;
+    }
+
+    .copy-btn {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+    }
+
+    .summary-text {
+      font-size: 14.5px;
+      line-height: 1.8;
+      color: var(--text-primary);
+    }
+    .summary-text p { margin-bottom: 12px; }
+    .summary-text strong { font-weight: 600; }
+    .summary-text h3 { font-family: var(--font-display); font-size: 16px; margin: 16px 0 8px; }
+
+    /* ============================================================
+       SECTION 9: TAB 3 — PAPER CARD
+    ============================================================ */
+    .paper-card-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 16px;
+      flex-shrink: 0;
+    }
+
+    .info-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+      overflow-y: auto;
+      flex: 1;
+    }
+
+    .info-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-default);
+      border-radius: var(--radius-lg);
+      padding: 16px;
+      position: relative;
+      overflow: hidden;
+      box-shadow: var(--shadow-card);
+      transition: all var(--t-normal);
+      animation: card-enter 0.4s ease both;
+    }
+
+    .info-card:hover {
+      box-shadow: var(--shadow-hover);
+      transform: translateY(-2px);
+    }
+
+    @keyframes card-enter {
+      from { opacity: 0; transform: translateY(14px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .info-card:nth-child(1) { animation-delay: 0.05s; }
+    .info-card:nth-child(2) { animation-delay: 0.10s; }
+    .info-card:nth-child(3) { animation-delay: 0.15s; }
+    .info-card:nth-child(4) { animation-delay: 0.20s; }
+    .info-card:nth-child(5) { animation-delay: 0.25s; }
+    .info-card:nth-child(6) { animation-delay: 0.30s; }
+    .info-card:nth-child(7) { animation-delay: 0.35s; }
+    .info-card:nth-child(8) { animation-delay: 0.40s; }
+
+    .info-card-accent {
+      position: absolute;
+      left: 0; top: 0; bottom: 0;
+      width: 4px;
+      border-radius: 4px 0 0 4px;
+    }
+
+    .info-card-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      margin-bottom: 8px;
+      padding-left: 12px;
+    }
+
+    .info-card-title {
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--text-muted);
+    }
+
+    .info-card-content {
+      font-size: 13.5px;
+      color: var(--text-primary);
+      line-height: 1.6;
+      padding-left: 12px;
+    }
+
+    .info-card-evidence {
+      margin-top: 8px;
+      padding-left: 12px;
+      font-size: 11px;
+      color: var(--text-muted);
+      font-family: var(--font-mono);
+    }
+
+    /* ============================================================
+       SECTION 10: TAB 4 — LITERATURE MATRIX
+    ============================================================ */
+    .matrix-layout { display: flex; flex-direction: column; height: 100%; }
+
+    .matrix-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+      flex-shrink: 0;
+    }
+
+    .table-wrapper {
+      flex: 1;
+      overflow: auto;
+      border: 1px solid var(--border-default);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-card);
+    }
+
+    .matrix-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+
+    .matrix-table th {
+      background: rgba(91,95,238,0.05);
+      padding: 12px 16px;
+      text-align: left;
+      border-bottom: 2px solid rgba(91,95,238,0.15);
+      font-weight: 600;
+      font-size: 12px;
+      color: var(--text-secondary);
+      white-space: nowrap;
+      position: sticky;
+      top: 0;
+      z-index: 2;
+    }
+
+    .matrix-table th.paper-col {
+      min-width: 160px;
+      max-width: 200px;
+    }
+
+    .matrix-table th.dim-col {
+      min-width: 120px;
+      position: sticky;
+      left: 0;
+      background: rgba(250,250,248,0.95);
+      border-right: 1px solid var(--border-default);
+    }
+
+    .matrix-table td {
+      padding: 11px 16px;
+      border-bottom: 1px solid var(--border-default);
+      vertical-align: top;
+      line-height: 1.5;
+      color: var(--text-primary);
+      max-width: 200px;
+    }
+
+    .matrix-table td.dim-cell {
+      font-weight: 600;
+      font-size: 11.5px;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      position: sticky;
+      left: 0;
+      background: #FAFAF8;
+      border-right: 1px solid var(--border-default);
+    }
+
+    .matrix-table tr:hover td { background: rgba(91,95,238,0.02); }
+    .matrix-table tr:hover td.dim-cell { background: rgba(250,250,248,1); }
+
+    .paper-header-cell {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .paper-dot {
+      width: 10px; height: 10px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .cell-text {
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    /* Empty state */
+    .empty-state {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      color: var(--text-muted);
+      text-align: center;
+    }
+
+    .empty-state .empty-icon { font-size: 48px; opacity: 0.5; }
+    .empty-state p { font-size: 14px; color: var(--text-secondary); max-width: 280px; }
+
+    /* ============================================================
+       SECTION 11: TAB 5 — RESEARCH GAP
+    ============================================================ */
+    .gap-layout { display: flex; flex-direction: column; height: 100%; }
+
+    .gap-list {
+      flex: 1;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .gap-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-default);
+      border-radius: var(--radius-lg);
+      padding: 18px 20px;
+      position: relative;
+      overflow: hidden;
+      box-shadow: var(--shadow-card);
+      transition: all var(--t-normal);
+      animation: card-enter 0.4s ease both;
+    }
+
+    .gap-card:hover { box-shadow: var(--shadow-hover); transform: translateY(-2px); }
+
+    .gap-card-accent {
+      position: absolute;
+      left: 0; top: 0; bottom: 0;
+      width: 4px;
+      background: var(--accent-coral);
+      border-radius: 4px 0 0 4px;
+    }
+
+    .gap-number {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 22px; height: 22px;
+      background: rgba(244,63,94,0.1);
+      color: var(--accent-coral);
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+
+    .gap-title {
+      font-family: var(--font-display);
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 10px;
+      padding-left: 10px;
+    }
+
+    .gap-evidence {
+      border-left: 3px solid var(--accent-teal);
+      background: rgba(14,165,160,0.05);
+      padding: 10px 14px;
+      border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+      margin-bottom: 12px;
+      margin-left: 10px;
+    }
+
+    .gap-evidence blockquote {
+      font-size: 13px;
+      font-style: italic;
+      color: var(--text-secondary);
+      line-height: 1.6;
+    }
+
+    .gap-direction {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding-left: 10px;
+    }
+
+    .direction-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      background: rgba(14,165,160,0.1);
+      color: var(--accent-teal);
+      border: 1px solid rgba(14,165,160,0.2);
+      padding: 5px 12px;
+      border-radius: var(--radius-pill);
+      font-size: 12px;
+      font-weight: 500;
+    }
+
+    /* ============================================================
+       SECTION 12: UTILITIES
+    ============================================================ */
+    .divider { height: 1px; background: var(--border-default); margin: 4px 0; }
+
+    .flex { display: flex; }
+    .flex-col { flex-direction: column; }
+    .items-center { align-items: center; }
+    .justify-between { justify-content: space-between; }
+    .gap-2 { gap: 8px; }
+    .gap-3 { gap: 12px; }
+    .ml-auto { margin-left: auto; }
+
+    .hidden { display: none !important; }
+  </style>
+</head>
+<body>
+
+<!-- ============================================================
+     SECTION A: APP SHELL
+============================================================ -->
+<div class="app-shell">
+
+  <!-- ============================================================
+       SECTION B: SIDEBAR
+  ============================================================ -->
+  <aside class="sidebar">
+
+    <!-- Logo -->
+    <div class="sidebar-logo">
+      <div class="logo-icon">🔬</div>
+      <span class="logo-text">ResearchAI</span>
+      <span class="logo-badge">PRO</span>
+    </div>
+
+    <!-- Upload Zone -->
+    <div class="sidebar-section">
+      <div class="sidebar-label">Upload Documents</div>
+      <div class="upload-zone" id="uploadZone"
+           ondragover="event.preventDefault(); this.classList.add('drag-over')"
+           ondragleave="this.classList.remove('drag-over')"
+           ondrop="handleDrop(event)">
+        <span class="upload-icon">☁️</span>
+        <p class="upload-text">
+          <strong>Drag & drop</strong> your papers here<br />or click to browse
+        </p>
+        <p class="upload-filetypes">PDF · DOCX · TXT</p>
+        <input type="file" id="fileInput" multiple accept=".pdf,.docx,.txt"
+               style="position:absolute;inset:0;opacity:0;cursor:pointer"
+               onchange="handleFiles(this.files)" />
+      </div>
+    </div>
+
+    <!-- Document List -->
+    <div class="sidebar-section" style="padding-bottom:4px;">
+      <div class="sidebar-label">Active Documents</div>
+    </div>
+    <div class="doc-list" id="docList">
+      <!-- Document: ready -->
+      <div class="doc-chip selected" onclick="toggleDoc(this)">
+        <div class="doc-chip-checkbox"></div>
+        <div class="doc-chip-icon">📄</div>
+        <div class="doc-chip-info">
+          <div class="doc-chip-name">attention_is_all_you.pdf</div>
+          <div class="doc-chip-meta">2.1MB · 15 pages</div>
+        </div>
+        <div class="doc-chip-status"><span class="status-dot ready"></span></div>
+      </div>
+
+      <div class="doc-chip selected" onclick="toggleDoc(this)">
+        <div class="doc-chip-checkbox"></div>
+        <div class="doc-chip-icon">📄</div>
+        <div class="doc-chip-info">
+          <div class="doc-chip-name">bert_pretraining.pdf</div>
+          <div class="doc-chip-meta">3.4MB · 22 pages</div>
+        </div>
+        <div class="doc-chip-status"><span class="status-dot ready"></span></div>
+      </div>
+
+      <div class="doc-chip" onclick="toggleDoc(this)">
+        <div class="doc-chip-checkbox"></div>
+        <div class="doc-chip-icon">📝</div>
+        <div class="doc-chip-info">
+          <div class="doc-chip-name">gpt4_technical_report.docx</div>
+          <div class="doc-chip-meta">1.8MB · 12 pages</div>
+        </div>
+        <div class="doc-chip-status"><span class="status-dot processing"></span></div>
+      </div>
+    </div>
+
+    <!-- Sidebar Footer -->
+    <div class="sidebar-footer">
+      <div class="model-badge">
+        🤖 Model: <span>llama3.2:3b</span>
+      </div>
+      <div class="token-bar-label">
+        <span>Token Usage</span><span>4,218 / 8,192</span>
+      </div>
+      <div class="token-bar-track">
+        <div class="token-bar-fill"></div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ============================================================
+       SECTION C: MAIN CONTENT
+  ============================================================ -->
+  <main class="main-content">
+    <!-- Top Bar with Tabs -->
+    <div class="top-bar">
+      <nav class="tab-nav" role="tablist">
+        <button class="tab-btn active" role="tab" onclick="switchTab('chat', this)">💬 Chat</button>
+        <button class="tab-btn" role="tab" onclick="switchTab('summary', this)">📝 Summary</button>
+        <button class="tab-btn" role="tab" onclick="switchTab('papercard', this)">🃏 Paper Card</button>
+        <button class="tab-btn" role="tab" onclick="switchTab('matrix', this)">📊 Matrix</button>
+        <button class="tab-btn" role="tab" onclick="switchTab('gap', this)">🔍 Research Gap</button>
+      </nav>
+    </div>
+
+    <!-- Tab Content Area -->
+    <div class="tab-content-area">
+
+      <!-- =========================================================
+           TAB 1: CHAT
+      ========================================================= -->
+      <div class="tab-panel active" id="tab-chat">
+        <div class="chat-layout">
+
+          <!-- Context bar -->
+          <div class="chat-context-bar">
+            <span>📚 Chatting with:</span>
+            <span class="context-pill">📄 attention_is_all_you.pdf</span>
+            <span class="context-pill">📄 bert_pretraining.pdf</span>
+            <button class="btn btn-ghost ml-auto" style="padding:4px 10px;font-size:12px;" onclick="clearChat()">🗑 Clear</button>
+          </div>
+
+          <!-- Messages -->
+          <div class="chat-messages" id="chatMessages">
+
+            <!-- AI Welcome Message -->
+            <div class="message">
+              <div class="avatar ai">🔬</div>
+              <div>
+                <div class="bubble ai">
+                  Hello! I've analyzed your 2 selected papers. I'm ready to answer questions about the <strong>Transformer architecture</strong>, <strong>BERT pretraining</strong>, attention mechanisms, or any comparisons between them. What would you like to know?
+                </div>
+              </div>
+            </div>
+
+            <!-- User Message -->
+            <div class="message user">
+              <div class="avatar user">👤</div>
+              <div>
+                <div class="bubble user">What is the main difference between the self-attention mechanism in the original Transformer and BERT's bidirectional attention?</div>
+              </div>
+            </div>
+
+            <!-- AI Response with Citations -->
+            <div class="message">
+              <div class="avatar ai">🔬</div>
+              <div style="max-width:75%">
+                <div class="bubble ai">
+                  The key difference lies in the <strong>directionality of context</strong>. The original Transformer uses <strong>masked (causal) self-attention</strong> in its decoder — each token can only attend to positions before it. This is essential for auto-regressive generation.<br /><br />
+                  BERT, on the other hand, uses <strong>bidirectional self-attention</strong> across all layers. Every token can attend to all other tokens simultaneously, both to the left and right. This is made possible by the <strong>Masked Language Model (MLM)</strong> objective during pretraining, which prevents the model from trivially "seeing" the answer.
+                </div>
+                <!-- Citation chips -->
+                <div class="citations">
+                  <span class="citation-chip" onclick="toggleDrawer('drawer1')">
+                    📄 attention_is_all_you.pdf · p.4 · 96%
+                  </span>
+                  <span class="citation-chip" onclick="toggleDrawer('drawer2')">
+                    📄 bert_pretraining.pdf · p.3 · 91%
+                  </span>
+                </div>
+                <!-- Citation drawers -->
+                <div class="citation-drawer" id="drawer1">
+                  <div class="citation-excerpt">
+                    <strong style="color:var(--accent-teal);font-size:11px;">📄 Attention Is All You Need · Page 4</strong><br /><br />
+                    "We also modify the self-attention sub-layer in the decoder stack to prevent positions from attending to subsequent positions. This <span class="citation-highlight">masking, combined with fact that the output embeddings are offset by one position, ensures that the predictions for position i can depend only on the known outputs at positions less than i.</span>"
+                  </div>
+                </div>
+                <div class="citation-drawer" id="drawer2">
+                  <div class="citation-excerpt">
+                    <strong style="color:var(--accent-teal);font-size:11px;">📄 BERT: Pre-training of Deep Bidirectional Transformers · Page 3</strong><br /><br />
+                    "Unlike recent language representation models, <span class="citation-highlight">BERT is designed to pre-train deep bidirectional representations from unlabeled text by jointly conditioning on both left and right context in all layers.</span> As a result, the pre-trained BERT model can be fine-tuned with just one additional output layer..."
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Typing indicator (demo) -->
+            <div class="message" id="typingIndicator" style="display:none;">
+              <div class="avatar ai">🔬</div>
+              <div class="bubble ai" style="padding:0;">
+                <div class="typing-dots">
+                  <div class="typing-dot"></div>
+                  <div class="typing-dot"></div>
+                  <div class="typing-dot"></div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Chat Input -->
+          <div class="chat-input-area">
+            <div class="chat-input-wrapper">
+              <textarea class="chat-textarea" id="chatInput" rows="1"
+                placeholder="Ask anything about your selected papers..."
+                onkeydown="handleChatKey(event)"
+                oninput="autoResize(this)"></textarea>
+              <button class="send-btn" onclick="sendMessage()" title="Send (Enter)">➤</button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- =========================================================
+           TAB 2: SUMMARY
+      ========================================================= -->
+      <div class="tab-panel" id="tab-summary">
+        <div class="summary-layout">
+
+          <div class="section-title">Smart Summary</div>
+          <div class="section-subtitle">Select a document and choose the type of summary you need.</div>
+
+          <!-- Controls -->
+          <div class="summary-controls" style="flex-shrink:0;">
+            <select class="select-styled" id="summaryDoc">
+              <option>attention_is_all_you.pdf</option>
+              <option>bert_pretraining.pdf</option>
+            </select>
+            <button class="btn btn-primary" onclick="generateSummary()">⚡ Generate Summary</button>
+          </div>
+
+          <!-- Type grid -->
+          <div class="summary-type-grid">
+            <div class="summary-type-card selected" onclick="selectSummaryType(this)">
+              <span class="card-icon">📋</span>
+              <div class="card-label">Brief Overview</div>
+            </div>
+            <div class="summary-type-card" onclick="selectSummaryType(this)">
+              <span class="card-icon">📖</span>
+              <div class="card-label">Detailed Summary</div>
+            </div>
+            <div class="summary-type-card" onclick="selectSummaryType(this)">
+              <span class="card-icon">⚙️</span>
+              <div class="card-label">Methodology</div>
+            </div>
+            <div class="summary-type-card" onclick="selectSummaryType(this)">
+              <span class="card-icon">📈</span>
+              <div class="card-label">Results</div>
+            </div>
+            <div class="summary-type-card" onclick="selectSummaryType(this)">
+              <span class="card-icon">💡</span>
+              <div class="card-label">Contributions</div>
+            </div>
+            <div class="summary-type-card" onclick="selectSummaryType(this)">
+              <span class="card-icon">⚠️</span>
+              <div class="card-label">Limitations</div>
+            </div>
+          </div>
+
+          <!-- Output -->
+          <div class="summary-output">
+            <div class="summary-output-inner">
+              <button class="btn btn-ghost copy-btn" onclick="copyText()" style="padding:5px 12px;font-size:12px;">📋 Copy</button>
+              <div class="summary-text">
+                <h3>Brief Overview — Attention Is All You Need</h3>
+                <p>
+                  This landmark paper introduces the <strong>Transformer</strong>, a novel sequence transduction model architecture that relies entirely on attention mechanisms, dispensing with recurrence and convolutions altogether. Proposed by Vaswani et al. (2017) at Google Brain, it fundamentally changed the field of natural language processing.
+                </p>
+                <p>
+                  The core innovation is the <strong>multi-head self-attention mechanism</strong>, which allows the model to jointly attend to information from different representation subspaces at different positions. Coupled with positional encoding to retain sequence order, this architecture achieves superior parallelization compared to RNN-based models.
+                </p>
+                <p>
+                  Results on WMT 2014 English-to-German (28.4 BLEU) and English-to-French (41.0 BLEU) translation tasks surpassed all previously published models, establishing a new state of the art with significantly reduced training time. The model's elegant simplicity and superior performance made it the foundational architecture for subsequent large language models.
+                </p>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- =========================================================
+           TAB 3: PAPER CARD
+      ========================================================= -->
+      <div class="tab-panel" id="tab-papercard">
+        <div class="paper-card-header">
+          <div>
+            <div class="section-title">Paper Card</div>
+            <div class="section-subtitle">Structured extraction from your selected paper.</div>
+          </div>
+          <div class="ml-auto flex gap-2">
+            <select class="select-styled">
+              <option>attention_is_all_you.pdf</option>
+              <option>bert_pretraining.pdf</option>
+            </select>
+            <button class="btn btn-primary">⚡ Extract</button>
+            <button class="btn btn-outline">🔄 Refresh</button>
+          </div>
+        </div>
+
+        <div class="info-grid">
+
+          <!-- Card: Problem -->
+          <div class="info-card">
+            <div class="info-card-accent" style="background:#6366F1;"></div>
+            <div class="info-card-header">
+              <span class="info-card-title">❓ Problem</span>
+              <span class="confidence-badge badge-high">🟢 High</span>
+            </div>
+            <div class="info-card-content">
+              Existing sequence transduction models rely on complex RNNs or CNNs. Recurrence prevents parallelization during training, limiting performance on long sequences.
+            </div>
+            <div class="info-card-evidence">📎 p.1: "The dominant sequence transduction models are based on complex recurrent..."</div>
+          </div>
+
+          <!-- Card: Objective -->
+          <div class="info-card">
+            <div class="info-card-accent" style="background:#8B5CF6;"></div>
+            <div class="info-card-header">
+              <span class="info-card-title">🎯 Objective</span>
+              <span class="confidence-badge badge-high">🟢 High</span>
+            </div>
+            <div class="info-card-content">
+              Propose a model architecture based solely on attention mechanisms, eliminating recurrence and convolutions to enable significantly more parallelization.
+            </div>
+            <div class="info-card-evidence">📎 p.2: "In this work we propose the Transformer, a model architecture eschewing recurrence..."</div>
+          </div>
+
+          <!-- Card: Methodology -->
+          <div class="info-card">
+            <div class="info-card-accent" style="background:#0EA5A0;"></div>
+            <div class="info-card-header">
+              <span class="info-card-title">⚙️ Methodology</span>
+              <span class="confidence-badge badge-high">🟢 High</span>
+            </div>
+            <div class="info-card-content">
+              Encoder-Decoder architecture using stacked multi-head self-attention layers and position-wise feed-forward networks. Positional encoding used to inject sequence order.
+            </div>
+            <div class="info-card-evidence">📎 p.3: "Multi-Head Attention allows the model to jointly attend to information..."</div>
+          </div>
+
+          <!-- Card: Dataset -->
+          <div class="info-card">
+            <div class="info-card-accent" style="background:#F59E0B;"></div>
+            <div class="info-card-header">
+              <span class="info-card-title">📊 Dataset</span>
+              <span class="confidence-badge badge-medium">🟡 Medium</span>
+            </div>
+            <div class="info-card-content">
+              WMT 2014 English-German (4.5M sentence pairs) and WMT 2014 English-French (36M sentences). English constituency parsing Penn Treebank (40K sentences).
+            </div>
+            <div class="info-card-evidence">📎 p.7: "We trained on the standard WMT 2014 English-German dataset..."</div>
+          </div>
+
+          <!-- Card: Results -->
+          <div class="info-card">
+            <div class="info-card-accent" style="background:#10B981;"></div>
+            <div class="info-card-header">
+              <span class="info-card-title">📈 Results</span>
+              <span class="confidence-badge badge-high">🟢 High</span>
+            </div>
+            <div class="info-card-content">
+              BLEU of 28.4 on EN-DE (surpassing ensembles by 2 BLEU). BLEU of 41.0 on EN-FR. Training cost ¼ of best previous single models.
+            </div>
+            <div class="info-card-evidence">📎 p.8: "...our model achieves 28.4 BLEU on the WMT 2014 English-to-German..."</div>
+          </div>
+
+          <!-- Card: Contributions -->
+          <div class="info-card">
+            <div class="info-card-accent" style="background:#5B5FEE;"></div>
+            <div class="info-card-header">
+              <span class="info-card-title">💡 Contributions</span>
+              <span class="confidence-badge badge-high">🟢 High</span>
+            </div>
+            <div class="info-card-content">
+              First transduction model relying entirely on self-attention. Multi-head attention formulation. Sinusoidal positional encoding. Foundation for GPT, BERT, and modern LLMs.
+            </div>
+            <div class="info-card-evidence">📎 p.2: "To the best of our knowledge, the Transformer is the first transduction model..."</div>
+          </div>
+
+          <!-- Card: Limitations -->
+          <div class="info-card">
+            <div class="info-card-accent" style="background:#F43F5E;"></div>
+            <div class="info-card-header">
+              <span class="info-card-title">⚠️ Limitations</span>
+              <span class="confidence-badge badge-medium">🟡 Medium</span>
+            </div>
+            <div class="info-card-content">
+              Quadratic complexity O(n²) of self-attention with respect to sequence length. Memory-intensive for very long sequences. Limited evaluation on non-NLP tasks.
+            </div>
+            <div class="info-card-evidence">📎 p.6: "...self-attention layers connect all positions with a constant number of sequentially executed operations..."</div>
+          </div>
+
+          <!-- Card: Future Work -->
+          <div class="info-card">
+            <div class="info-card-accent" style="background:#EC4899;"></div>
+            <div class="info-card-header">
+              <span class="info-card-title">🔮 Future Work</span>
+              <span class="confidence-badge badge-low">🔴 Low</span>
+            </div>
+            <div class="info-card-content">
+              Authors suggest extending Transformer to image, audio, and video modalities. Local and restricted attention for efficiency. Generating less sequentially and more in parallel.
+            </div>
+            <div class="info-card-evidence">📎 p.10: "We are excited about the future of attention-based models and plan to apply them to other tasks..."</div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- =========================================================
+           TAB 4: LITERATURE MATRIX
+      ========================================================= -->
+      <div class="tab-panel" id="tab-matrix">
+        <div class="matrix-layout">
+          <div class="matrix-header">
+            <div>
+              <div class="section-title">Literature Matrix</div>
+              <div class="section-subtitle" style="margin-bottom:0;">Side-by-side comparison across research dimensions.</div>
+            </div>
+            <button class="btn btn-outline" style="font-size:13px;">↓ Download .md</button>
+          </div>
+
+          <div class="table-wrapper">
+            <table class="matrix-table">
+              <thead>
+                <tr>
+                  <th class="dim-col">Dimension</th>
+                  <th class="paper-col">
+                    <div class="paper-header-cell">
+                      <div class="paper-dot" style="background:#6366F1;"></div>
+                      Attention Is All You Need
+                    </div>
+                  </th>
+                  <th class="paper-col">
+                    <div class="paper-header-cell">
+                      <div class="paper-dot" style="background:#10B981;"></div>
+                      BERT Pretraining
+                    </div>
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td class="dim-cell">Problem</td>
+                  <td><div class="cell-text">RNN/CNN models prevent parallelization; bottleneck for long-range dependencies.</div></td>
+                  <td><div class="cell-text">Existing LMs are unidirectional; limited context for fine-tuning on downstream tasks.</div></td>
+                </tr>
+                <tr>
+                  <td class="dim-cell">Objective</td>
+                  <td><div class="cell-text">Build a fully attention-based sequence-to-sequence model for NLP tasks.</div></td>
+                  <td><div class="cell-text">Pre-train deep bidirectional Transformer encoders for transfer learning.</div></td>
+                </tr>
+                <tr>
+                  <td class="dim-cell">Method</td>
+                  <td><div class="cell-text">Encoder-Decoder with multi-head self-attention, positional encoding, FFN layers.</div></td>
+                  <td><div class="cell-text">Masked Language Model (MLM) + Next Sentence Prediction (NSP) pretraining objectives.</div></td>
+                </tr>
+                <tr>
+                  <td class="dim-cell">Dataset</td>
+                  <td><div class="cell-text">WMT 2014 EN-DE (4.5M pairs), WMT 2014 EN-FR (36M), Penn Treebank.</div></td>
+                  <td><div class="cell-text">BooksCorpus (800M words) + English Wikipedia (2,500M words).</div></td>
+                </tr>
+                <tr>
+                  <td class="dim-cell">Results</td>
+                  <td><div class="cell-text">28.4 BLEU on EN-DE, 41.0 BLEU on EN-FR. SOTA at time of publication.</div></td>
+                  <td><div class="cell-text">GLUE score 80.5%, SQuAD v1.1 F1 93.2. SOTA across 11 NLP tasks.</div></td>
+                </tr>
+                <tr>
+                  <td class="dim-cell">Contribution</td>
+                  <td><div class="cell-text">Introduced the Transformer architecture — foundation of modern LLMs (GPT, BERT, T5).</div></td>
+                  <td><div class="cell-text">Demonstrated pre-train + fine-tune paradigm; bidirectional context for language understanding.</div></td>
+                </tr>
+                <tr>
+                  <td class="dim-cell">Limitation</td>
+                  <td><div class="cell-text">O(n²) attention complexity; not evaluated on non-language tasks at publication.</div></td>
+                  <td><div class="cell-text">MLM is suboptimal for generation tasks; NSP objective later found to be less useful.</div></td>
+                </tr>
+                <tr>
+                  <td class="dim-cell">Future Work</td>
+                  <td><div class="cell-text">Apply to image, audio, video; local/restricted attention for efficiency.</div></td>
+                  <td><div class="cell-text">Extend to generation tasks; domain-specific pretraining; multilingual variants.</div></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- =========================================================
+           TAB 5: RESEARCH GAP
+      ========================================================= -->
+      <div class="tab-panel" id="tab-gap">
+        <div class="gap-layout">
+
+          <div class="flex items-center justify-between" style="margin-bottom:16px;flex-shrink:0;">
+            <div>
+              <div class="section-title">Research Gap Analysis</div>
+              <div class="section-subtitle" style="margin-bottom:0;">Identified gaps from your 2 selected papers.</div>
+            </div>
+            <button class="btn btn-primary">🔍 Re-analyze</button>
+          </div>
+
+          <div class="gap-list">
+
+            <!-- Gap 1 -->
+            <div class="gap-card" style="animation-delay:0.05s">
+              <div class="gap-card-accent"></div>
+              <div style="padding-left:12px;">
+                <div class="gap-number">1</div>
+                <div class="gap-title">Quadratic Complexity in Self-Attention for Long Documents</div>
+                <div class="gap-evidence">
+                  <blockquote>"Self-attention layers connect all positions with a constant number of sequentially executed operations, whereas a recurrent layer requires O(n) sequential operations." — Neither paper adequately addresses efficiency for sequences exceeding 4,096 tokens.</blockquote>
+                </div>
+                <div class="gap-direction">
+                  <span>💡 Suggested Direction:</span>
+                  <span class="direction-pill">→ Linear-complexity attention variants (Longformer, BigBird)</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Gap 2 -->
+            <div class="gap-card" style="animation-delay:0.15s">
+              <div class="gap-card-accent"></div>
+              <div style="padding-left:12px;">
+                <div class="gap-number">2</div>
+                <div class="gap-title">Limited Cross-Modal Generalization Beyond Text</div>
+                <div class="gap-evidence">
+                  <blockquote>Both papers are evaluated exclusively on NLP benchmarks. The architectural inductive biases are untested on structured data, graphs, or multimodal inputs at publication time. Future work sections mention interest but provide no experimental evidence.</blockquote>
+                </div>
+                <div class="gap-direction">
+                  <span>💡 Suggested Direction:</span>
+                  <span class="direction-pill">→ Vision Transformers (ViT), multimodal pre-training frameworks</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Gap 3 -->
+            <div class="gap-card" style="animation-delay:0.25s">
+              <div class="gap-card-accent"></div>
+              <div style="padding-left:12px;">
+                <div class="gap-number">3</div>
+                <div class="gap-title">Inability to Handle Generative Tasks in BERT's Bidirectional Design</div>
+                <div class="gap-evidence">
+                  <blockquote>"BERT is not designed for text generation tasks due to its bidirectional nature" — the MLM objective creates a fundamentally different capability from the autoregressive Transformer decoder, leaving a gap for unified encoder-decoder architectures.</blockquote>
+                </div>
+                <div class="gap-direction">
+                  <span>💡 Suggested Direction:</span>
+                  <span class="direction-pill">→ Unified seq2seq pre-training (T5, BART, UniLM)</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Gap 4 -->
+            <div class="gap-card" style="animation-delay:0.35s">
+              <div class="gap-card-accent"></div>
+              <div style="padding-left:12px;">
+                <div class="gap-number">4</div>
+                <div class="gap-title">Positional Encoding Does Not Scale to Unseen Sequence Lengths</div>
+                <div class="gap-evidence">
+                  <blockquote>Sinusoidal positional encoding extrapolates poorly to sequence lengths beyond training distribution. Both BERT's learned embeddings and the Transformer's sinusoidal encodings lack a principled solution for length generalization.</blockquote>
+                </div>
+                <div class="gap-direction">
+                  <span>💡 Suggested Direction:</span>
+                  <span class="direction-pill">→ Relative positional encodings (RoPE, ALiBi, T5 Bias)</span>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+          <div style="margin-top:12px;flex-shrink:0;">
+            <p style="font-size:12px;color:var(--text-muted);">⚠️ These gaps are AI-generated suggestions based on the provided documents only. Always verify with a broader literature review.</p>
+          </div>
+
+        </div>
+      </div>
+
+    </div><!-- end tab-content-area -->
+  </main>
+
+</div><!-- end app-shell -->
+
+<!-- ============================================================
+     SECTION D: JAVASCRIPT
+============================================================ -->
+<script>
+  /* ---- Tab switching ---- */
+  function switchTab(tabId, btn) {
+    // Hide all panels & deactivate all buttons
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+
+    // Activate selected
+    document.getElementById('tab-' + tabId).classList.add('active');
+    btn.classList.add('active');
+  }
+
+  /* ---- Document selection toggle ---- */
+  function toggleDoc(chip) {
+    chip.classList.toggle('selected');
+  }
+
+  /* ---- Summary type selection ---- */
+  function selectSummaryType(card) {
+    document.querySelectorAll('.summary-type-card').forEach(c => c.classList.remove('selected'));
+    card.classList.add('selected');
+  }
+
+  /* ---- Chat: citation drawer toggle ---- */
+  function toggleDrawer(id) {
+    const drawer = document.getElementById(id);
+    drawer.classList.toggle('open');
+  }
+
+  /* ---- Chat: auto-resize textarea ---- */
+  function autoResize(el) {
+    el.style.height = 'auto';
+    el.style.height = Math.min(el.scrollHeight, 120) + 'px';
+  }
+
+  /* ---- Chat: handle Enter key ---- */
+  function handleChatKey(e) {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      sendMessage();
+    }
+  }
+
+  /* ---- Chat: send message (demo) ---- */
+  function sendMessage() {
+    const input = document.getElementById('chatInput');
+    const text = input.value.trim();
+    if (!text) return;
+
+    const messages = document.getElementById('chatMessages');
+    const typing = document.getElementById('typingIndicator');
+
+    // Append user message
+    const userMsg = document.createElement('div');
+    userMsg.className = 'message user';
+    userMsg.innerHTML = `
+      <div class="avatar user">👤</div>
+      <div><div class="bubble user">${escapeHtml(text)}</div></div>
+    `;
+    messages.insertBefore(userMsg, typing);
+
+    // Clear input
+    input.value = '';
+    input.style.height = 'auto';
+
+    // Show typing indicator
+    typing.style.display = 'flex';
+    messages.scrollTop = messages.scrollHeight;
+
+    // Simulate AI response after delay
+    setTimeout(() => {
+      typing.style.display = 'none';
+      const aiMsg = document.createElement('div');
+      aiMsg.className = 'message';
+      aiMsg.innerHTML = `
+        <div class="avatar ai">🔬</div>
+        <div style="max-width:75%">
+          <div class="bubble ai">
+            That's a great question! Based on the documents you've uploaded, I can analyze this from multiple perspectives. The papers collectively suggest that this area has seen significant development between 2017 and 2018, with the Transformer architecture serving as the foundational building block for subsequent advances.
+          </div>
+          <div class="citations">
+            <span class="citation-chip" onclick="toggleDrawer('dynamic1')">📄 attention_is_all_you.pdf · p.2 · 88%</span>
+          </div>
+          <div class="citation-drawer" id="dynamic1">
+            <div class="citation-excerpt">
+              <strong style="color:var(--accent-teal);font-size:11px;">📄 Attention Is All You Need · Page 2</strong><br/><br/>
+              "The Transformer follows an encoder-decoder structure using <span class="citation-highlight">stacked self-attention and point-wise, fully connected layers for both the encoder and decoder</span>, shown in the left and right halves of Figure 1, respectively."
+            </div>
+          </div>
+        </div>
+      `;
+      messages.insertBefore(aiMsg, typing);
+      messages.scrollTop = messages.scrollHeight;
+    }, 1800);
+  }
+
+  function clearChat() {
+    const messages = document.getElementById('chatMessages');
+    // Keep only the first welcome message and typing indicator
+    const allMessages = messages.querySelectorAll('.message:not(#typingIndicator)');
+    allMessages.forEach((msg, i) => { if (i > 0) msg.remove(); });
+  }
+
+  /* ---- Summary generate (demo) ---- */
+  function generateSummary() {
+    const btn = event.target;
+    btn.textContent = '⏳ Generating...';
+    btn.disabled = true;
+    setTimeout(() => {
+      btn.textContent = '⚡ Generate Summary';
+      btn.disabled = false;
+    }, 1200);
+  }
+
+  /* ---- Copy button ---- */
+  function copyText() {
+    const text = document.querySelector('.summary-text')?.innerText || '';
+    navigator.clipboard.writeText(text).then(() => {
+      const btn = event.target;
+      btn.textContent = '✓ Copied!';
+      setTimeout(() => btn.textContent = '📋 Copy', 1500);
+    });
+  }
+
+  /* ---- File upload handlers ---- */
+  function handleDrop(e) {
+    e.preventDefault();
+    document.getElementById('uploadZone').classList.remove('drag-over');
+    const files = e.dataTransfer.files;
+    handleFiles(files);
+  }
+
+  function handleFiles(files) {
+    const docList = document.getElementById('docList');
+    Array.from(files).forEach(file => {
+      const ext = file.name.split('.').pop().toLowerCase();
+      const icon = ext === 'pdf' ? '📄' : ext === 'docx' ? '📝' : '📃';
+      const sizeMB = (file.size / 1024 / 1024).toFixed(1);
+
+      const chip = document.createElement('div');
+      chip.className = 'doc-chip';
+      chip.onclick = function() { toggleDoc(this); };
+      chip.innerHTML = `
+        <div class="doc-chip-checkbox"></div>
+        <div class="doc-chip-icon">${icon}</div>
+        <div class="doc-chip-info">
+          <div class="doc-chip-name">${escapeHtml(file.name)}</div>
+          <div class="doc-chip-meta">${sizeMB}MB · Processing…</div>
+        </div>
+        <div class="doc-chip-status"><span class="status-dot processing"></span></div>
+      `;
+      docList.appendChild(chip);
+
+      // Simulate processing complete
+      setTimeout(() => {
+        chip.querySelector('.doc-chip-meta').textContent = `${sizeMB}MB · Ready`;
+        chip.querySelector('.status-dot').className = 'status-dot ready';
+      }, 2000 + Math.random() * 1500);
+    });
+  }
+
+  /* ---- Helpers ---- */
+  function escapeHtml(str) {
+    return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
+</script>
+
+</body>
+</html>
